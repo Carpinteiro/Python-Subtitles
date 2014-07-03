@@ -15,6 +15,9 @@ base_url = 'http://api.thesubdb.com/?{0}'
 #user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'
 user_agent = 'SubDB/1.0 (Carpinteiro/0.1; https://github.com/Carpinteiro/Legendas)'
 my_path = "/home/carpinteiro/WorkSpace/Python/"
+config = 'config.txt'
+diretorias = []
+ficheiros = []
 
 #verificar se o ficheiro existe
 '''if not os.path.isfile(HASHES_FILE):
@@ -40,7 +43,9 @@ def download_subtitle(hashinc,languageinc,filename):
     
     response = urllib2.urlopen(req)
     ext = response.info()['Content-Disposition'].split(".")[1]
+    print response.info()
     file = os.path.splitext(filename)[0] + "." + ext
+
     with open(file, "wb") as fout:        
         fout.write(response.read())
 
@@ -48,27 +53,53 @@ def download_subtitle(hashinc,languageinc,filename):
     #print url
     #wget.download(url)
 
-def check_language():
+def check_language(filename):
 	params = {'action': 'languages'}
 	url = base_url.format(urllib.urlencode(params))
+	
 	req = urllib2.Request(url)
 	req.add_header('User-Agent',user_agent)
-	response = []
+	
 	response = urllib2.urlopen(req)
-	print response
+	print response.info()
+	file = open(filename,"wb")
+	file.write(response.read())
+
+
+def have_subtitle(filename,diretoriaSearch):
+	diretoria = os.listdir(diretoriaSearch)
+	ext = filename.split(".")
+	contem = ext.pop(len(ext)-1)
+	print contem
+	#print(ext.index(len(ext)-1))
+	
+def get_all_files(diretoriaSearch):
+	diretoria = os.listdir(diretoriaSearch)
+        for file in diretoria:
+        	if(os.path.isdir(file)):
+        		diretorias.append(file)
+        		#print "TEM UM"
+        	else:
+        		ficheiros.append(file)
+        		#print file
+        for f in ficheiros:
+        	have_subtitle(f,diretoriaSearch)
+        	print f
+
 
 def main(argv):
     if len(sys.argv) != 1:
         print "Usage: python legendas.py"
         sys.exit (1)
     else:
-        #check_languages()
-        download_subtitle(get_hash('Californication.S07E05.720p.HDTV.x264-2HD.mkv'),'pt,en','Californication.S07E05.720p.HDTV.x264-2HD.srt')
+        #download_subtitle(get_hash('Californication.S07E05.720p.HDTV.x264-2HD.mkv'),'pt,en','Californication.S07E05.720p.HDTV.x264-2HD.srt')
         #print glob.glob("/home/carpinteiro/WorkSpace/Python/*")
         onlyfiles = [ f for f in listdir(my_path) if isfile(join(my_path,f)) ]
         print onlyfiles
 
-        check_language()
+        check_language(config)
+        get_all_files(my_path)
+
 
         
 
