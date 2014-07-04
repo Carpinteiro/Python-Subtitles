@@ -18,9 +18,9 @@ my_path = "/home/carpinteiro/WorkSpace/Python/"
 config = 'config.txt'
 diretorias = []
 ficheiros = []
-nl = []
-nnl = []
-
+lista_de_filmes = []
+lista_de_legendas = []
+lista_de_extensoes = []
 #verificar se o ficheiro existe
 '''if not os.path.isfile(HASHES_FILE):
         logger.info("hash file does not exist yet")
@@ -81,10 +81,10 @@ def have_subtitle(filename,diretoriaSearch):
 	print nf
 	if(sem_ext == 'mkv' or sem_ext == 'srt' or sem_ext == 'mp4'):
 	#nome dos ficheiros sem a extensao
-		nl.append(nf)
+		lista_de_filmes.append(nf)
 	print("lista")
-	print nl
-	nova = [x for x, y in collections.Counter(nl).items() if y > 1]
+	print lista_de_filmes
+	nova = [x for x, y in collections.Counter(lista_de_filmes).items() if y > 1]
 		
 	
 	
@@ -119,25 +119,27 @@ def get_all_files(diretoriaSearch):
         	ext = f.split(".")
         	sem_ext = ext.pop(len(ext)-1)
         	nf = f[:-4]
-        	#print nf
+        	print sem_ext
         	if(sem_ext == 'mkv' or sem_ext == 'mp4'):
-        		nl.append(nf)
+        		lista_de_filmes.append(nf)
         	elif(sem_ext == 'srt'):
-        		nnl.append(nf)
+        		lista_de_legendas.append(nf)
        	#list(set(l) - set(l2))
     	print"\nDiretorias:"
     	for p in diretorias:
     		print p
     		#get_all_files(p)
-    	#nova = [x for x, y in collections.Counter(nl).items() if x > 0]
-    	#print nl
-    	#print nnl
+    	#nova = [x for x, y in collections.Counter(lista_de_filmes).items() if x > 0]
+    	#print lista_de_filmes
+    	#print lista_de_legendas
     	#seen = set()
     	#seen_add = seen.add
-    	#nova = [ x for x in nl if not (x in seen() or seen_add(x))]
-    	#nova = remove_duplicates(nl)
-    	nova = list(set(nl) - set(nnl))
-    	print nova
+    	#nova = [ x for x in lista_de_filmes if not (x in seen() or seen_add(x))]
+    	#nova = remove_duplicates(lista_de_filmes)
+    	#print lista_de_filmes
+    	#print lista_de_legendas
+    	nova = list(set(lista_de_filmes) - set(lista_de_legendas))
+    	return nova
 
 
 def main(argv):
@@ -153,7 +155,11 @@ def main(argv):
         #print onlyfiles
 
         #check_language(config)
-        get_all_files(my_path)
+        x = get_all_files(my_path)
+        print x
+        	
+        
+
 
 
         
