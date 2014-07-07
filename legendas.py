@@ -12,6 +12,7 @@ from os.path import isfile, join
 import collections
 import traceback
 from urllib2 import Request, urlopen, URLError, HTTPError
+import shutil
 
 #install wget , requests
 base_url = 'http://api.thesubdb.com/?{0}'
@@ -62,6 +63,7 @@ def download_subtitle(hashinc,languageinc,filename):
 
 	with open(file, "wb") as fout:
 		fout.write(response.read())
+		return 1
 
 def check_language(filename):
 	params = {'action': 'languages'}
@@ -170,7 +172,16 @@ def main(argv):
         	print "going to write legend here:"
         	print legend
         	print what + "\n"
-        	download_subtitle(get_hash(what),'pt,en',legend)
+        	did_it = download_subtitle(get_hash(what),'pt,en',legend)
+        	#criar as pastas para cada serie
+        	if (did_it == 1):
+        		create = my_path + leg
+        		print "CREATE"
+        		print create
+        		os.mkdir( create, 0755 );
+        		#move the files
+	        	shutil.move(what,create)
+	        	shutil.move(legend,create)
         
         for dir in diretorias:
         	#refresh das listas
