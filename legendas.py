@@ -1,3 +1,4 @@
+# -*- coding: latin-1 -*-
 import os.path
 import hashlib
 import sys
@@ -45,15 +46,11 @@ def download_subtitle(hashinc,languageinc,filename):
     
     response = urllib2.urlopen(req)
     ext = response.info()['Content-Disposition'].split(".")[1]
-    print response.info()
+    #print response.info()
     file = os.path.splitext(filename)[0] + "." + ext
 
     with open(file, "wb") as fout:        
         fout.write(response.read())
-
-    #url = 'http://api.thesubdb.com/?action=download&hash=' + hashinc + '&language='+languageinc
-    #print url
-    #wget.download(url)
 
 def check_language(filename):
 	params = {'action': 'languages'}
@@ -63,83 +60,81 @@ def check_language(filename):
 	req.add_header('User-Agent',user_agent)
 	
 	response = urllib2.urlopen(req)
-	print response.info()
+	#print response.info()
 	file = open(filename,"wb")
 	file.write("Linguagens disponiveis para download:\n")
 	file.write(response.read())
 
-##METODO ESTA NO GET_ALL FILES
-def have_subtitle(filename,diretoriaSearch):
-	diretoria = os.listdir(diretoriaSearch)
-	
-	#lista com as extensoes dos ficheiros
-	ext = filename.split(".")
-	sem_ext = ext.pop(len(ext)-1)
-	#print sem_ext
+def find_file_extension(filename):
+	return os.path.isfile(filename)
 
-	nf = filename[:-4]
-	print nf
-	if(sem_ext == 'mkv' or sem_ext == 'srt' or sem_ext == 'mp4'):
-	#nome dos ficheiros sem a extensao
-		lista_de_filmes.append(nf)
-	print("lista")
-	print lista_de_filmes
-	nova = [x for x, y in collections.Counter(lista_de_filmes).items() if y > 1]
-		
-	
-	
+#dada uma lista e uma linguagem tenta sacar as legendas
+def do_download(List_with_no_subtitle,languageinc):
+        for need in List_with_no_subtitle:
+        	c = need[:-4]
+        	print c
+        	c += '.srt'
+        	print c
+        	print need
+        	download_subtitle(get_hash(need),languageinc,c)
+        	'''#MP4
+        	b = need +'.mp4'
+        	result = find_file_extension(b)
+        	if result == True:
+        		c = need +'.srt'
+        		download_subtitle(get_hash(b),languageinc,c)
+        	
+        	#MKV
+        	b = need +'.mkv'
+        	print b
+        	result = find_file_extension(b)
+        	print result
+        	if result == True:
+        		c = need +'.srt'
+        		print c
+        		download_subtitle(get_hash(b),languageinc,c)
+        	
+        	#AVI
+        	b = need +'.avi'
+        	result = find_file_extension(b)
+        	if result == True:
+        		c = need +'.srt'
+        		download_subtitle(get_hash(b),languageinc,c)'''
 
-	#sem_ext = ext.pop(len(ext)-1)
-	#print sem_ext
-	#print(ext.index(len(ext)-1))
-def list_duplicates(seq):
-  seen = set()
-  seen_add = seen.add
-  # adds all elements it doesn't know yet to seen and all other to seen_twice
-  seen_twice = set( x for x in seq if x in seen or seen_add(x) )
-  # turn the set into a list (as requested)
-  return list( seen_twice )
 
-def remove_duplicates(l):
-    return list(set(l))
-
+#devolve uma lista com todos os filmes sem legenda e guarda as diretorias encontradas
 def get_all_files(diretoriaSearch):
 	diretoria = os.listdir(diretoriaSearch)
         for file in diretoria:
+        	#se for uma pasta
         	if(os.path.isdir(file)):
         		diretorias.append(file)
-        		#print "TEM UM"
+        	#se for um ficheiro
         	else:
         		ficheiros.append(file)
-        		#print file
+
         print"\nFicheiros:"
         for f in ficheiros:
-        	#have_subtitle(f,diretoriaSearch)
-        	#print f
         	ext = f.split(".")
+        	#sem_ext e a extensao
         	sem_ext = ext.pop(len(ext)-1)
+        	#nf é o nome do ficheiro sem extensao
         	nf = f[:-4]
-        	print sem_ext
-        	if(sem_ext == 'mkv' or sem_ext == 'mp4'):
-        		lista_de_filmes.append(nf)
-        	elif(sem_ext == 'srt'):
+        	#print sem_ext
+        	if(sem_ext == 'mkv' or sem_ext == 'mp4' or sem_ext == 'avi'):
+        		check = nf + '.srt'
+        		if not (find_file_extension(check)):
+        			print "file:"
+        			print f
+        			lista_de_filmes.append(f)
+
+        	'''elif(sem_ext == 'srt'):
         		lista_de_legendas.append(nf)
        	#list(set(l) - set(l2))
-    	print"\nDiretorias:"
-    	for p in diretorias:
-    		print p
-    		#get_all_files(p)
-    	#nova = [x for x, y in collections.Counter(lista_de_filmes).items() if x > 0]
-    	#print lista_de_filmes
-    	#print lista_de_legendas
-    	#seen = set()
-    	#seen_add = seen.add
-    	#nova = [ x for x in lista_de_filmes if not (x in seen() or seen_add(x))]
-    	#nova = remove_duplicates(lista_de_filmes)
-    	#print lista_de_filmes
-    	#print lista_de_legendas
+       	#lista de filmes naquela directoria sem .srt
     	nova = list(set(lista_de_filmes) - set(lista_de_legendas))
-    	return nova
+    	#print lista_de_extensoes'''
+    	return lista_de_filmes
 
 
 def main(argv):
@@ -147,17 +142,25 @@ def main(argv):
         print "Usage: python legendas.py"
         sys.exit (1)
     else:
-        #download_subtitle(get_hash('Californication.S07E05.720p.HDTV.x264-2HD.mkv'),'pt,en','Californication.S07E05.720p.HDTV.x264-2HD.srt')
-        #download_subtitle(get_hash('Petals.On.The.Wind.2014.HDRip.XviD-EVO.avi'),'pt,en','Petals.On.The.Wind.2014.HDRip.XviD-EVO.srt')
-        #download_subtitle(get_hash('Game of Thrones S02E01.mp4'),'pt,en','Game of Thrones S02E01.srt')
-        #print glob.glob("/home/carpinteiro/WorkSpace/Python/*")
-        #onlyfiles = [ f for f in listdir(my_path) if isfile(join(my_path,f)) ]
-        #print onlyfiles
+        check_language(config)
+        print "All information you need is in config.txt"
+        print "\nWhat languages do you want to your subtitles?"
+        print "if more than one write it like : 'pt,en'\n"
+        #languages_choosen = raw_input("I want subtitles in :")
 
-        #check_language(config)
         x = get_all_files(my_path)
+        print "Lista de filmes sem legenda:\n"
         print x
-        	
+        for what in x:
+        	leg = what[:-4]
+        	legend = leg + '.srt'
+        	print what
+        	download_subtitle(get_hash(what),'pt,en',leg)
+        
+        #raw_input("\nPress Enter to continue...")
+               
+
+
         
 
 
