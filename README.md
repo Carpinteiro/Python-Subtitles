@@ -11,8 +11,10 @@
 
 ## Dia 9 de Julho
 * - Programa implementado de forma a correr sempre num SO , e a organizar as pastas desorganizadas
+
 ## Dia 12 de Julho
 * - Entrega do projecto ao professor
+
 ## Actualizado
 * 8 Julho 2014
 
