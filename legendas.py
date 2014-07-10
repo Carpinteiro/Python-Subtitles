@@ -7,6 +7,7 @@ import requests
 import urllib
 import urllib2
 import glob
+import json
 from os import listdir
 from os.path import isfile, join
 import collections
@@ -18,8 +19,11 @@ import shutil
 base_url = 'http://api.thesubdb.com/?{0}'
 #user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'
 user_agent = 'SubDB/1.0 (Carpinteiro/0.1; https://github.com/Carpinteiro/Legendas)'
-my_path = "/home/carpinteiro/WorkSpace/Python/"
-config = 'config.txt'
+my_path = ""
+create = ""
+#my_path = "/home/carpinteiro/WorkSpace/Python/"
+config = {}
+#config = 'config.txt'
 diretorias = []
 ficheiros = []
 lista_de_filmes = []
@@ -46,24 +50,26 @@ def download_subtitle(hashinc,languageinc,filename):
     url = base_url.format(urllib.urlencode(params))
     req = urllib2.Request(url)
     req.add_header('User-Agent', user_agent)
-    
+
     try:
     	response = urllib2.urlopen(req)
     except HTTPError,e :
     	print 'The server couldn\'t fulfill the request.'
     	print 'Error code: ',e.code, 'Not Found'
+    	return 0
     except URLError, e:
     	print 'We failed to reach a server.'
     	print 'Reason: ', e.reason
+    	return 0
     else:
+    	#print response.info()
     	ext = response.info()['Content-Disposition'].split(".")[1]
-	    #print response.info()
-	print 'done'
-	file = os.path.splitext(filename)[0] + "." + ext
+    	print 'done'
+    	file = os.path.splitext(filename)[0] + "." + ext
 
-	with open(file, "wb") as fout:
-		fout.write(response.read())
-		return 1
+    	with open(file, "wb") as fout:
+			fout.write(response.read())
+			return 1
 
 def check_language(filename):
 	params = {'action': 'languages'}
@@ -81,43 +87,72 @@ def check_language(filename):
 def find_file_extension(filename):
 	return os.path.isfile(filename)
 
-#dada uma lista e uma linguagem tenta sacar as legendas
-def do_download(List_with_no_subtitle,languageinc):
-        for need in List_with_no_subtitle:
-        	c = need[:-4]
-        	print c
-        	c += '.srt'
-        	print c
-        	print need
-        	download_subtitle(get_hash(need),languageinc,c)
-        	'''#MP4
-        	b = need +'.mp4'
-        	result = find_file_extension(b)
-        	if result == True:
-        		c = need +'.srt'
-        		download_subtitle(get_hash(b),languageinc,c)
-        	
-        	#MKV
-        	b = need +'.mkv'
-        	print b
-        	result = find_file_extension(b)
-        	print result
-        	if result == True:
-        		c = need +'.srt'
-        		print c
-        		download_subtitle(get_hash(b),languageinc,c)
-        	
-        	#AVI
-        	b = need +'.avi'
-        	result = find_file_extension(b)
-        	if result == True:
-        		c = need +'.srt'
-        		download_subtitle(get_hash(b),languageinc,c)'''
+def read_configurations():
+	return config['diretoria']
 
+def do_list_download(ListToDownload):
+	global create
+	print "List to Download"
+	print ListToDownload
+	#raw_input("\nPress Enter to continue...")
+	for what in ListToDownload:
+		print "pito"
+		print what
+		leg = what[:-4]
+		legend = leg + '.srt'
+		did = download_subtitle(get_hash(what),'pt,en',legend)
+		print did
+		if did == 0:
+			ListToDownload.remove(what)
+			do_list_download(ListToDownload)
+			break
+		else:
+			print "consegui"
+			print "CREATE"
+			#print create
+			create = my_path + leg
+        	if not os.path.exists(create):
+        		print ListToDownload
+        		os.mkdir(create)
+        		#move the files
+        		shutil.move(what,create)
+        		shutil.move(legend,create)
+        		ListToDownload.remove(what)
+        		do_list_download(ListToDownload)
+        		break
+        	else:
+        		print "asdasd"
+
+	
+def do_recursive_downloads():
+	print diretorias
+	if len(diretorias) == 0:
+		return
+	for dire in diretorias:
+		del ficheiros[0:len(ficheiros)]
+    	del lista_de_filmes[0:len(lista_de_filmes)]
+    	print "NOVA DIR"
+    	novadir = my_path + dire
+    	print novadir
+    	#mudar e verificacao que mudou a diretoria
+    	os.chdir(novadir)
+    	retval = os.getcwd()
+    	print "Directory changed successfully %s" % retval
+    	#lista com os filmes a sacar da nova diretoria
+    	y = get_all_files(retval)
+    	print "\nLista de filmes sem legenda mais abaixo:\n"
+    	print y
+    	do_list_download(y)
+    	diretorias.remove(dire)
+    	do_recursive_downloads()
+    	#break
+    	#print my_path
+    	#os.chdir(my_path)
 
 #devolve uma lista com todos os filmes sem legenda e guarda as diretorias encontradas
 def get_all_files(diretoriaSearch):
 	diretoria = os.listdir(diretoriaSearch)
+	#print diretoria
         for file in diretoria:
         	#se for uma pasta
         	if(os.path.isdir(file)):
@@ -126,7 +161,7 @@ def get_all_files(diretoriaSearch):
         	else:
         		ficheiros.append(file)
 
-        print"\nFicheiros:"
+        print"\nEstou a ver Ficheiros na diretoria:"+ diretoriaSearch
         for f in ficheiros:
         	ext = f.split(".")
         	#sem_ext e a extensao
@@ -136,10 +171,10 @@ def get_all_files(diretoriaSearch):
         	#print sem_ext
         	if(sem_ext == 'mkv' or sem_ext == 'mp4' or sem_ext == 'avi'):
         		check = nf + '.srt'
-        		print "Check"
-        		print(check)
         		if not (find_file_extension(check)):
+        			print nf
         			lista_de_filmes.append(f)
+
 
         	'''elif(sem_ext == 'srt'):
         		lista_de_legendas.append(nf)
@@ -155,68 +190,34 @@ def main(argv):
         print "Usage: python legendas.py"
         sys.exit (1)
     else:
-        check_language(config)
+    	global my_path
+       	with open('config.json') as handle:
+    		config.update(json.load(handle))
+    	print config["diretoria"]
+    	my_path = read_configurations()
+       	#Obter o caminho dado pelo utilizador, ### FALTA AS LINGUAGENS ###
+    	
+
+
+    	#check_language(config)
         print "All information you need is in config.txt"
         print "\nWhat languages do you want to your subtitles?"
         print "if more than one write it like : 'pt,en'\n"
         #languages_choosen = raw_input("I want subtitles in :")
 
-        print "Lista de filmes sem legenda:\n"
+        print "\nLista de filmes sem legenda:\n"
         x = get_all_files(my_path)
         print x
         print '\n'
         raw_input("\nPress Enter to download subtitles to those movies...")
-        for what in x:
-        	leg = what[:-4]
-        	legend = leg + '.srt'
-        	print "going to write legend here:"
-        	print legend
-        	print what + "\n"
-        	did_it = download_subtitle(get_hash(what),'pt,en',legend)
-        	#criar as pastas para cada serie
-        	if (did_it == 1):
-        		create = my_path + leg
-        		print "CREATE"
-        		print create
-        		os.mkdir( create, 0755 );
-        		#move the files
-	        	shutil.move(what,create)
-	        	shutil.move(legend,create)
         
-        for dir in diretorias:
-        	#refresh das listas
-        	del ficheiros[0:len(ficheiros)]
-        	del lista_de_filmes[0:len(lista_de_filmes)]
-        	#lista de ficheiros
-        	print "LISTA DE FICHEIROS"
-        	print ficheiros
-        	#criacao da nova diretoria
-        	print "NOVA DIR"
-        	novadir = my_path + dir
-        	print novadir
-        	#mudar e verificacao que mudou a diretoria
-        	os.chdir(novadir)
-        	retval = os.getcwd()
-        	print "Directory changed successfully %s" % retval
-        	#lista com os filmes a sacar da nova diretoria
-        	y = get_all_files(novadir)
-        	print "Lista de filmes sem legenda mais abaixo:\n"
-        	print y
-        	for what in y:
-        		leg = what[:-4]
-        		legend = leg + '.srt'
-        		download_subtitle(get_hash(what),'pt,en',legend)
-        	os.chdir(my_path)
-
-
-
-
-
+        do_list_download(x)
+        raw_input("\nPress Enter to download other diretories...")
+        do_recursive_downloads()
+        #Voltar à pasta inicial
+        	
         
 
-
-
-        
 
 if __name__ == "__main__":
     main(sys.argv[1:])
