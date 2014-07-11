@@ -154,8 +154,7 @@ def get_all_files(diretoriaSearch):
 	diretoria = os.listdir(diretoriaSearch)
 	#print diretoria
         for file in diretoria:
-        	#se for uma pasta
-        	if(os.path.isdir(file)):
+        	if(os.path.isdir(file) and file != "Series"):
         		diretorias.append(file)
         	#se for um ficheiro
         	else:
