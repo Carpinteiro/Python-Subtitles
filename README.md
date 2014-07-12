@@ -1,5 +1,5 @@
 # Calendarização
-
+----
 ## Dia 3 Julho
 *  - Descrição do projecto
 
@@ -15,9 +15,33 @@
 ## Dia 12 de Julho
 * - Entrega do projecto ao professor
 
+----
+
+
+
+#Projecto
+----
+##Instalação- Pacotes do python
+
+    pip install -r requirements.txt
+
+##Execução
+    python legendas.py
+    python organize.py
+
+##Configuração
+    {
+	"diretoria": "/path/to/directory/where/the/videos/are/",
+	"linguagens" : "pt"
+    }
+##Observações
+Se o utilizador quiser que as suas séries sejam organizadas o nome da pasta deve ser:
+NomeDaSerie.SXEY.(...)
+onde X e Y é o número correspondente à temporada e episódio
+
+----
+
 ## Actualizado
 * 8 Julho 2014
 
-
-----
 * [GIT](https://github.com/Carpinteiro/Python-Subtitles)

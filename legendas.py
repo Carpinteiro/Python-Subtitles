@@ -20,10 +20,12 @@ base_url = 'http://api.thesubdb.com/?{0}'
 #user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'
 user_agent = 'SubDB/1.0 (Carpinteiro/0.1; https://github.com/Carpinteiro/Legendas)'
 my_path = ""
+languages_choosen = ""
 create = ""
 #my_path = "/home/carpinteiro/WorkSpace/Python/"
 config = {}
 #config = 'config.txt'
+linguagens = 'linguagens.txt'
 diretorias = []
 ficheiros = []
 lista_de_filmes = []
@@ -87,32 +89,30 @@ def check_language(filename):
 def find_file_extension(filename):
 	return os.path.isfile(filename)
 
-def read_configurations():
+def read_path():
 	return config['diretoria']
+
+def read_languages():
+    return config['linguagens']
 
 def do_list_download(ListToDownload):
 	global create
-	print "List to Download"
-	print ListToDownload
+	#print "List to Download"
+	#print ListToDownload
 	#raw_input("\nPress Enter to continue...")
 	for what in ListToDownload:
-		print "pito"
-		print what
+		print '\n'+ what
 		leg = what[:-4]
 		legend = leg + '.srt'
-		did = download_subtitle(get_hash(what),'pt,en',legend)
-		print did
+		did = download_subtitle(get_hash(what),languages_choosen,legend)
 		if did == 0:
 			ListToDownload.remove(what)
 			do_list_download(ListToDownload)
 			break
 		else:
-			print "consegui"
-			print "CREATE"
-			#print create
 			create = my_path + leg
         	if not os.path.exists(create):
-        		print ListToDownload
+        		#print ListToDownload
         		os.mkdir(create)
         		#move the files
         		shutil.move(what,create)
@@ -121,7 +121,7 @@ def do_list_download(ListToDownload):
         		do_list_download(ListToDownload)
         		break
         	else:
-        		print "asdasd"
+        		print ""
 
 	
 def do_recursive_downloads():
@@ -131,17 +131,17 @@ def do_recursive_downloads():
 	for dire in diretorias:
 		del ficheiros[0:len(ficheiros)]
     	del lista_de_filmes[0:len(lista_de_filmes)]
-    	print "NOVA DIR"
+    	#print "NOVA DIR"
     	novadir = my_path + dire
-    	print novadir
+    	#print novadir
     	#mudar e verificacao que mudou a diretoria
     	os.chdir(novadir)
     	retval = os.getcwd()
-    	print "Directory changed successfully %s" % retval
+    	#print "Directory changed successfully %s" % retval
     	#lista com os filmes a sacar da nova diretoria
     	y = get_all_files(retval)
-    	print "\nLista de filmes sem legenda mais abaixo:\n"
-    	print y
+    	#print "\nLista de filmes sem legenda mais abaixo:\n"
+    	#print y
     	do_list_download(y)
     	diretorias.remove(dire)
     	do_recursive_downloads()
@@ -160,7 +160,7 @@ def get_all_files(diretoriaSearch):
         	else:
         		ficheiros.append(file)
 
-        print"\nEstou a ver Ficheiros na diretoria:"+ diretoriaSearch
+        
         for f in ficheiros:
         	ext = f.split(".")
         	#sem_ext e a extensao
@@ -171,16 +171,8 @@ def get_all_files(diretoriaSearch):
         	if(sem_ext == 'mkv' or sem_ext == 'mp4' or sem_ext == 'avi'):
         		check = nf + '.srt'
         		if not (find_file_extension(check)):
-        			print nf
+        			#print nf
         			lista_de_filmes.append(f)
-
-
-        	'''elif(sem_ext == 'srt'):
-        		lista_de_legendas.append(nf)
-       	#list(set(l) - set(l2))
-       	#lista de filmes naquela directoria sem .srt
-    	nova = list(set(lista_de_filmes) - set(lista_de_legendas))
-    	#print lista_de_extensoes'''
     	return lista_de_filmes
 
 
@@ -190,15 +182,14 @@ def main(argv):
         sys.exit (1)
     else:
     	global my_path
+        global languages_choosen
        	with open('config.json') as handle:
     		config.update(json.load(handle))
-    	print config["diretoria"]
-    	my_path = read_configurations()
-       	#Obter o caminho dado pelo utilizador, ### FALTA AS LINGUAGENS ###
-    	
-
-
-    	#check_language(config)
+    	#print config["diretoria"]
+    	my_path = read_path()
+        languages_choosen = read_languages()
+        
+    	check_language(linguagens)
         print "All information you need is in config.txt"
         print "\nWhat languages do you want to your subtitles?"
         print "if more than one write it like : 'pt,en'\n"

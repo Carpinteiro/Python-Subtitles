@@ -17,16 +17,6 @@ import shutil
 
 my_path = ""
 config ={}
-'''
-if not os.path.exists(create):
-        		print ListToDownload
-        		os.mkdir(create)
-        		#move the files
-        		shutil.move(what,create)
-        		shutil.move(legend,create)
-        		ListToDownload.remove(what)
-        		do_list_download(ListToDownload)
-'''
 
 def get_all_series():
 	#global season_number
@@ -121,7 +111,7 @@ def get_all_series():
 			
 
 
-			
+# FAZER PARA AS OUTRAS EXTENSOES
 
 
 
