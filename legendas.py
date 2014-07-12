@@ -72,7 +72,7 @@ def download_subtitle(hashinc,languageinc,filename):
     	with open(file, "wb") as fout:
 			fout.write(response.read())
 			return 1
-
+#vai buscar as linguagens disponiveis para fazer download
 def check_language(filename):
 	params = {'action': 'languages'}
 	url = base_url.format(urllib.urlencode(params))
@@ -86,15 +86,19 @@ def check_language(filename):
 	file.write("Linguagens disponiveis para download:\n")
 	file.write(response.read())
 
+#verifica se o ficheiro existe
 def find_file_extension(filename):
 	return os.path.isfile(filename)
 
+#ler para o my_path
 def read_path():
 	return config['diretoria']
 
+#ler linguagens
 def read_languages():
     return config['linguagens']
 
+#fazer o download de legendas para a lista de videos sem legenda
 def do_list_download(ListToDownload):
 	global create
 	#print "List to Download"
@@ -123,7 +127,7 @@ def do_list_download(ListToDownload):
         	else:
         		print ""
 
-	
+#fazer o download de ficheiros que estejam noutras pastas na mesma diretoria
 def do_recursive_downloads():
 	print diretorias
 	if len(diretorias) == 0:
@@ -190,9 +194,6 @@ def main(argv):
         languages_choosen = read_languages()
         
     	check_language(linguagens)
-        print "All information you need is in config.txt"
-        print "\nWhat languages do you want to your subtitles?"
-        print "if more than one write it like : 'pt,en'\n"
         #languages_choosen = raw_input("I want subtitles in :")
 
         print "\nLista de filmes sem legenda:\n"

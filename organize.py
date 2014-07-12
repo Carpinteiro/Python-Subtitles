@@ -18,6 +18,7 @@ import shutil
 my_path = ""
 config ={}
 
+# função que basicamente faz o controlo de pastas e cria e move as pastas para se organizarem
 def get_all_series():
 	#global season_number
 	directorio_organizar = my_path + "Series"
@@ -26,9 +27,9 @@ def get_all_series():
 	retval = os.getcwd()
 	#series é a lista com todas as pastas dentro da pasta Series
 	series = os.listdir(directorio_organizar)
-	print retval
-	print "Pastas contidas dentro das series:"
-	print series
+	#print retval
+	#print "Pastas contidas dentro das series:"
+	#print series
 	for pastas in series:
 		lista_do_nome = pastas.split(".")
 		#se nao for uma pasta so com o nome da serie
@@ -43,13 +44,13 @@ def get_all_series():
 			#print info
 			#percorrer a informação da serie
 			for index in range(len(info)):
-				print "info[index"
-				print info[index]
+				#print "info[index"
+				#print info[index]
 				if (info[index] == 'S'):
 					season_number += info[index]
 					season_number += info[index+1]
 					season_number += info[index+2]
-					print season_number
+					#print season_number
 
 				elif(info[index] == 'E'):
 					episode_number = info[index]
@@ -64,7 +65,7 @@ def get_all_series():
 			if not os.path.exists(nome_da_serie):
 				os.mkdir(nome_da_serie)
 				entrar_dentro_da_pasta = directorio_organizar + '/'+nome_da_serie
-				print entrar_dentro_da_pasta
+				#print entrar_dentro_da_pasta
 				os.chdir(entrar_dentro_da_pasta)
 
 				onde_estou = os.getcwd()
@@ -80,7 +81,6 @@ def get_all_series():
 				os.mkdir(episode_number)
 				os.chdir(directorio_organizar)
 				shutil.move(pastas,segundo_nivel)
-				#"FAZER O IGNORAR SERIES NO LEGENDAS"
 			
 			#se ja existir a pasta com o nome da serie
 			
@@ -106,18 +106,10 @@ def get_all_series():
 					except Exception, e:
 						print "Ja existe Esse ficheiro"
 
-				print "EXISTE"
+				#print "EXISTE"
 				#if not os.path.exists()
 			
-
-
-# FAZER PARA AS OUTRAS EXTENSOES
-
-
-
-
-
-
+#ler my path
 def read_configurations():
 	return config['diretoria']
 
