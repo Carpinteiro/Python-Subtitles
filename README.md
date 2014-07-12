@@ -37,11 +37,12 @@
 ##Observações
 Se o utilizador quiser que as suas séries sejam organizadas o nome da pasta deve ser:
 NomeDaSerie.SXEY.(...)
-onde X e Y é o número correspondente à temporada e episódio
+onde X e Y é o número correspondente à temporada e episódio. Essas pastas devem estar contidas numa pasta com o nome "Series"
+
 
 ----
 
 ## Actualizado
-* 8 Julho 2014
+* 12 Julho 2014 01:26
 
 * [GIT](https://github.com/Carpinteiro/Python-Subtitles)
